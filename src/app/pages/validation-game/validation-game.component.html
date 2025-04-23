@@ -1,0 +1,44 @@
+<ion-content class="ion-padding">
+  <h2 class="ion-text-center">Validation des réponses</h2>
+
+  <div>
+    <h3 class="ion-text-center">Lettre : {{ (turn$ | async)?.letter }}</h3>
+    <p>Temps restant : <strong>{{ (turn$ | async)?.timer}}s</strong></p>
+  </div>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="2"><strong>Joueur</strong></ion-col>
+      @for (cat of (game$|async)?.categories; track cat) {
+        <ion-col><strong>{{ cat }}</strong></ion-col>
+      }
+    </ion-row>
+
+    @for (player of (players$|async); track player.uid) {
+      <ion-row>
+      <ion-col size="2">{{ player.pseudo }}</ion-col>
+
+        @for (cat of (game$|async)?.categories; track cat) {
+          <ion-col>
+        <ion-item lines="none">
+          <ion-label>
+            {{ player?.getAnswer(cat)  }}
+          </ion-label>
+          @if(player.answers.has(cat)){
+            <ion-checkbox
+              [(ngModel)]="player.answers.get(cat)!.valide"
+              [checked]="false"
+              slot="end"
+            ></ion-checkbox>
+          }
+        </ion-item>
+      </ion-col>
+        }
+    </ion-row>
+    }
+  </ion-grid>
+
+  <ion-button expand="block" color="success" (click)="validateRound()" class="ion-margin-top">
+    Valider la manche
+  </ion-button>
+</ion-content>

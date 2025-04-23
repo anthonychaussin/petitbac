@@ -1,0 +1,30 @@
+<ion-content class="ion-padding">
+  <h2 class="ion-text-center">🎉 Fin de la Partie 🎉</h2>
+
+  <div class="ion-text-center ion-margin-vertical">
+    <ion-icon name="trophy-outline" size="large"></ion-icon>
+  </div>
+
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      @for (player of (players$|async); track player.uid) {
+        <ion-col size="4">
+        <ion-card [color]="getPodiumColor($index)">
+          <ion-card-header class="ion-text-center">
+            <ion-card-title>
+              {{ getMedalEmoji($index) }} {{ player.pseudo }}
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content class="ion-text-center">
+            Score : {{ player.score || 0 }}
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      }
+    </ion-row>
+  </ion-grid>
+
+  <ion-button expand="block" color="primary" class="ion-margin-top" (click)="replay()">
+    🔄 Rejouer avec cette partie
+  </ion-button>
+</ion-content>

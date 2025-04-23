@@ -1,0 +1,32 @@
+<ion-content class="ion-padding">
+  <h2 class="ion-text-center">Salle d’attente</h2>
+  <p class="ion-text-center">Partie ID : <strong>{{ gameId }}</strong></p>
+  @if (host){
+    <p class="ion-text-center">
+  <ion-label position="stacked">Lien d'invitation</ion-label>
+  <ion-input [value]="shareUrl" readonly></ion-input>
+  <ion-button fill="outline"  (click)="copyLink()">Copier</ion-button>
+      </p>
+  }
+  <ion-list>
+    @for ( player of (players$|async); track player.uid){
+      @if(!player.host){
+        <ion-item>
+        <ion-label>{{ player.pseudo }}</ion-label>
+      </ion-item>
+      }
+    }
+  </ion-list>
+
+  @if (host && (players$|async)?.length! > 2){
+    <ion-button
+      expand="block"
+      color="success"
+      (click)="startGame()"
+      class="ion-margin-top"
+    >
+    Lancer la partie
+  </ion-button>
+  }
+
+</ion-content>

@@ -1,0 +1,34 @@
+<ion-content class="ion-padding">
+  <h2 class="ion-text-center">En attente des autres joueurs... ⏳</h2>
+
+  <div>
+    <h3 class="ion-text-center">Réponses des joueurs</h3>
+    <p>Temps restant : <strong>{{ (turn$ | async)?.timer}}s</strong></p>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col><strong>Joueur</strong></ion-col>
+        @for (cat of (game$|async)?.categories; track cat) {
+          <ion-col>
+            <strong>{{ cat }}</strong>
+          </ion-col>
+        }
+      </ion-row>
+
+      @for (player of (players$ | async); track player.uid) {
+        <ion-row>
+          <ion-col>{{ player.pseudo }}</ion-col>
+          @for (cat of (game$|async)?.categories; track cat) {
+            <ion-col>
+              @if(player.uid == uid || (allDone$ | async)){
+                {{ player?.getAnswer(cat) }}
+              } @else {
+                <ion-spinner name="dots"></ion-spinner>
+              }
+            </ion-col>
+          }
+        </ion-row>
+      }
+    </ion-grid>
+  </div>
+</ion-content>

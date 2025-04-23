@@ -1,0 +1,15 @@
+<ion-content class="ion-padding">
+  <h2 class="ion-text-center">Rejoindre une partie</h2>
+  <p class="ion-text-center">Code : <strong>{{ gameId }}</strong></p>
+
+  @if (status != 'started') {
+    <ion-item>
+    <ion-label position="floating">Ton pseudo</ion-label>
+    <ion-input [(ngModel)]="pseudo"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" class="ion-margin-top" (click)="joinGame()">
+    Rejoindre
+  </ion-button>
+  }
+</ion-content>

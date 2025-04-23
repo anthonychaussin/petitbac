@@ -1,0 +1,42 @@
+<ion-content class="ion-padding">
+  <div class="ion-text-center">
+    <h2>Thème : {{ (gameParams$|async)?.theme }}</h2>
+    <h1 style="font-size: 72px;">{{ (turn$|async)?.letter }}</h1>
+    <p>Temps restant : <strong>{{ (turn$ | async)?.timer}}s</strong></p>
+  </div>
+
+  @if((gameParams$|async)?.categories?.length){
+  <form>
+    <ion-list>
+      @for (cat of (gameParams$|async)?.categories; track cat){
+      <ion-item>
+        <ion-label position="stacked">{{ cat }}</ion-label>
+        <ion-input
+          [(ngModel)]="answers[cat]"
+          [placeholder]="(turn$|async)?.letter"
+          name="{{ cat }}"
+          [disabled]="submitted"
+        ></ion-input>
+      </ion-item>
+      }
+    </ion-list>
+
+    <ion-button
+      expand="block"
+      color="primary"
+      class="ion-margin-top"
+      (click)="submit()"
+      [disabled]="submitted"
+    >
+      Envoyer les réponses
+    </ion-button>
+  </form>
+  }
+
+  @if(submitted){
+    <ion-text color="success" class="ion-margin-top ion-text-center">
+    <p>Réponses soumises ! En attente des autres joueurs...</p>
+  </ion-text>
+  }
+
+</ion-content>
