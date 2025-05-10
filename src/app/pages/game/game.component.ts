@@ -1,10 +1,21 @@
 import {AsyncPipe} from '@angular/common';
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnDestroy} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {IonButton, IonContent, IonInput, IonItem, IonLabel, IonList, IonText} from '@ionic/angular/standalone';
+import {
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonContent,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonText,
+  ToastController
+} from '@ionic/angular/standalone';
 import {Store} from '@ngrx/store';
-import {filter} from 'rxjs';
+import {filter, Subscription} from 'rxjs';
 import { AnswerService } from '../../services/answer.service';
 import {loadGameParams, loadGameStatus} from '../../state/game/game.actions';
 import {selectGameParams, selectGameStatus} from '../../state/game/game.selectors';
@@ -23,14 +34,17 @@ import {selectTurnData} from '../../state/turn/turn.selectors';
                FormsModule,
                IonButton,
                IonText,
-               AsyncPipe
+               AsyncPipe,
+               IonCard,
+               IonCardContent
              ]
            })
 
-export class GamePage {
+export class GamePage implements OnDestroy {
   private answerService: AnswerService = inject(AnswerService);
   private router: Router = inject(Router);
   private store = inject(Store);
+  private toastController: ToastController = inject(ToastController);
 
   gameId = '';
   gameParams$ = this.store.select(selectGameParams);
@@ -40,6 +54,7 @@ export class GamePage {
   uid = localStorage.getItem('uid') || crypto.randomUUID();
   answers: Record<string, string> = {};
   submitted = false;
+  private turnSubscriber: Subscription;
 
 
   constructor(
@@ -51,9 +66,10 @@ export class GamePage {
     this.store.dispatch(loadGameStatus({ gameId: this.gameId }));
 
     let started = false;
-    const turnSubscriber = this.turn$.pipe(filter(turn => turn),).subscribe(turn => {
+    this.turnSubscriber = this.turn$.pipe(filter(turn => turn),).subscribe(turn => {
       if(turn.timer == 0 && started) {
         this.submit();
+        this.turnSubscriber.unsubscribe();
       }
       if (turn.timer > 0){
         started = true;
@@ -63,20 +79,37 @@ export class GamePage {
     const gameSubscriber = this.gameStatus$.subscribe(status => {
       if(status === 'terminated'){
         this.router.navigate([`/end-game/${this.gameId}`]).then(() => {
-          turnSubscriber.unsubscribe();
+          this.turnSubscriber.unsubscribe();
           gameSubscriber.unsubscribe();
         });
       }
     })
   }
 
+  getTimerColor(t: number): string {
+    if (t > 20) return 'success';
+    if (t > 10) return 'warning';
+    return 'danger';
+  }
+
   async submit() {
     if (this.submitted) return;
     this.submitted = true;
 
-    this.answerService.submitAnswersToPlayerNode(this.gameId, this.uid, this.answers).then(() => {
-      alert('Réponses envoyées ✅');
+    this.answerService.submitAnswersToPlayerNode(this.gameId, this.uid, this.answers).then(async () => {
+      this.turnSubscriber.unsubscribe();
+      const toast = await this.toastController.create({
+                                                        message: 'Réponses envoyées ✅',
+                                                        duration: 1500,
+                                                        position: 'bottom',
+                                                      });
+
+      await toast.present();
       this.router.navigate([`/waiting-game/${this.gameId}`]);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.turnSubscriber.unsubscribe();
   }
 }

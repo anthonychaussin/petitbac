@@ -1,18 +1,33 @@
 import { Component } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import { Router } from '@angular/router';
-import {IonButton, IonContent, IonInput, IonItem, IonLabel} from '@ionic/angular/standalone';
+import {
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonContent,
+  IonInput,
+  IonItem,
+  IonLabel
+} from '@ionic/angular/standalone';
 
 @Component({
              selector: 'app-home',
              templateUrl: './home.component.html',
+             styleUrls: ['./home.component.scss'],
              imports: [
                IonContent,
                IonButton,
                IonItem,
                IonLabel,
                IonInput,
-               FormsModule
+               FormsModule,
+               IonCard,
+               IonCardHeader,
+               IonCardTitle,
+               IonCardContent
              ]
            })
 export class HomePage {

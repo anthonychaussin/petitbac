@@ -2,7 +2,19 @@ import {AsyncPipe} from '@angular/common';
 import {Component, inject} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-import {IonButton, IonCheckbox, IonCol, IonContent, IonGrid, IonItem, IonLabel, IonRow} from '@ionic/angular/standalone';
+import {
+  IonButton,
+  IonCard, IonCardContent,
+  IonCardTitle,
+  IonCheckbox,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonItem,
+  IonLabel,
+  IonRow,
+  IonText
+} from '@ionic/angular/standalone';
 import {Store} from '@ngrx/store';
 import {filter, firstValueFrom, take} from 'rxjs';
 import {map} from 'rxjs/operators';
@@ -29,7 +41,11 @@ import {selectTurnData} from '../../state/turn/turn.selectors';
                IonCheckbox,
                FormsModule,
                IonButton,
-               AsyncPipe
+               AsyncPipe,
+               IonText,
+               IonCard,
+               IonCardTitle,
+               IonCardContent
              ]
            })
 export class ValidationGamePage {
@@ -44,8 +60,13 @@ export class ValidationGamePage {
   turn$ = this.store.select(selectTurnData);
   game$ = this.store.select(selectGameParams);
   gameStatus$ = this.store.select(selectGameStatus);
+  allDone$ = this.players$.pipe(
+    filter(players => players?.length > 0),
+    map(players => players.every((p: { done: boolean; }) => p.done))
+  );
 
   validationMap: Record<string, Record<string, boolean>> = {};
+  uid = localStorage.getItem('uid') || crypto.randomUUID();
 
   constructor(
     private route: ActivatedRoute,
@@ -66,13 +87,18 @@ export class ValidationGamePage {
       }
     });
     const gameSubscriber = this.gameStatus$.subscribe(status => {
+      if(status === 'started'){
+        this.turn$.pipe(take(1)).subscribe(turn => {
+          this.gameService.startTimer(this.gameId, turn.timer);
+        })
+      }
       if(status === 'terminated'){
         this.router.navigate([`/end-game/${this.gameId}`]).then(() => {
           playerSubscriber.unsubscribe();
           gameSubscriber.unsubscribe();
         });
       }
-    })
+    });
   }
 
   toggleValidation(uid: string, category: string) {
@@ -100,7 +126,7 @@ export class ValidationGamePage {
     this.turn$.pipe(filter(turn => turn), take(1)).subscribe(turn => {
       this.game$.pipe(take(1)).subscribe(game => {
         if(game.turns >= turn.id){
-          this.gameService.nextTurn(this.gameId, turn.id + 1, turn);
+          this.gameService.nextTurn(this.gameId, turn.id + 1, turn, game.timer);
         } else {
           this.gameService.endGame(this.gameId).then(() => {
             this.router.navigate(['end-game/'+this.gameId]);
@@ -108,5 +134,11 @@ export class ValidationGamePage {
         }
       });
     });
+  }
+
+  getTimerColor(t: number): string {
+    if (t > 20) return 'success';
+    if (t > 10) return 'warning';
+    return 'danger';
   }
 }

@@ -1,56 +1,65 @@
 <ion-content class="ion-padding">
-  <h2 class="ion-text-center">Créer une partie</h2>
 
-  <form [formGroup]="form">
-    <ion-item>
-      <ion-label position="floating">Thème</ion-label>
+  <ion-card class="ion-padding">
+
+    <ion-card-header><h2 class="ion-text-center">Créer une partie</h2></ion-card-header>
+
+<form [formGroup]="form">
+    <ion-card-content>
+
+    <ion-item class="ion-margin">
+      <ion-label position="stacked">Thème</ion-label>
       <ion-input formControlName="theme"></ion-input>
     </ion-item>
 
-    <ion-list formArrayName="categories">
+    <ion-item class="ion-margin">
+      <ion-label  position="stacked">Catégories</ion-label>
+      <ion-list formArrayName="categories">
       @for (cat of categories.controls; track cat) {
         <ion-item [formGroupName]="$index">
         <ion-input formControlName="cat" placeholder="Catégorie {{ $index + 1 }}"></ion-input>
-          @if (categories.length > 1) {
+          @if (!$last && categories.length > 1) {
             <ion-button fill="clear" slot="end" color="danger" (click)="removeCategory($index)">
               <ion-icon slot="icon-only" name="close-outline"></ion-icon>
             </ion-button>
+          } @else {
+            <ion-button expand="block" (click)="addCategory()">+</ion-button>
           }
-      </ion-item>
+        </ion-item>
       }
-    </ion-list>
+      </ion-list>
+    </ion-item>
 
-    <ion-button expand="block" (click)="addCategory()">
-      Ajouter une catégorie
-    </ion-button>
+    <ion-item class="ion-margin">
+      <ion-label  position="stacked">Lettres autorisées</ion-label>
+      <ion-grid>
+      <ion-row formArrayName="allowedLetters">
+        @for (letter of allLetters; track letter) {
+          <ion-item [formGroupName]="$index">
+          <ion-checkbox formControlName="{{letter}}"
+          > {{ letter }} </ion-checkbox>
+        </ion-item>
+        }
+      </ion-row>
+    </ion-grid>
+    </ion-item>
 
-    <ion-item lines="full">
-  <ion-label>
-    <strong>Lettres autorisées</strong>
-    <p>Choisissez les lettres qui pourront être tirées</p>
-  </ion-label>
-</ion-item>
-
-<ion-grid>
-  <ion-row formArrayName="allowedLetters">
-    @for (letter of allLetters; track letter) {
-      <ion-row [formGroupName]="$index">
-      <ion-checkbox formControlName="{{letter}}"
-      > {{ letter }} </ion-checkbox>
-    </ion-row>
-    }
-  </ion-row>
-</ion-grid>
-
-
-<ion-grid>
-  <ion-row>
+    <ion-item class="ion-margin">
+      <ion-label  position="stacked">Nombre de manches</ion-label>
       <ion-range formControlName="turns" aria-label="Range with pin" [pin]="true" [ticks]="true" [snaps]="true" [min]="5" [max]="20"></ion-range>
-  </ion-row>
-</ion-grid>
+    </ion-item>
+
+    <ion-item class="ion-margin">
+      <ion-label position="stacked">Temps par manche (secondes)</ion-label>
+      <ion-input type="number" formControlName="timer" min="10" max="300" required></ion-input>
+    </ion-item>
+
+      </ion-card-content>
 
     <ion-button expand="block" color="primary" (click)="createGame()" class="ion-margin-top">
       Créer la partie
     </ion-button>
-  </form>
+
+    </form>
+    </ion-card>
 </ion-content>

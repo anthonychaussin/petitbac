@@ -2,7 +2,7 @@ import {Component, inject} from '@angular/core';
 import { Router } from '@angular/router';
 import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {
-  IonButton,
+  IonButton, IonCard, IonCardContent, IonCardHeader,
   IonCheckbox,
   IonContent,
   IonGrid,
@@ -32,7 +32,10 @@ import { GameService } from '../../services/game.service';
                IonGrid,
                IonRow,
                IonCheckbox,
-               IonRange
+               IonRange,
+               IonCard,
+               IonCardHeader,
+               IonCardContent
              ]
            })
 export class CreateGamePage {
@@ -45,6 +48,7 @@ export class CreateGamePage {
                                               categories: this.formBuilder.array([]),
                                               allowedLetters: this.formBuilder.array([]),
                                               turns: [5, Validators.required],
+                                              timer: [60, Validators.required],
                                             });
 
 
@@ -78,7 +82,7 @@ export class CreateGamePage {
 
   createGame() {
     if (this.form.valid) {
-      const { theme, categories, allowedLetters, turns } = this.form.value;
+      const { theme, categories, allowedLetters, turns, timer } = this.form.value;
       try{
         const uid = crypto.randomUUID();
         localStorage.setItem('uid', uid);
@@ -88,6 +92,7 @@ export class CreateGamePage {
           allowedLetters.filter((letter: { [s: string]: unknown; } | ArrayLike<unknown>) => Object.values(letter)[0])
                         .map((letter: {}) => Object.keys(letter)[0]),
           turns,
+          timer,
           uid
         ).then(code => {
           this.router.navigate(['/salle-attente', code]).then();

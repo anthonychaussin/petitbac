@@ -11,14 +11,13 @@ import { provideIonicAngular } from '@ionic/angular/standalone';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-import {AnswerEffects} from './state/answer/answer.effects';
-import {answerReducer} from './state/answer/answer.reducer';
 import {GameEffects} from './state/game/game.effects';
 import {gameReducer} from './state/game/game.reducer';
 import {PlayerEffects} from './state/player/player.effects';
 import {playerReducer} from './state/player/player.reducer';
 import {TurnEffects} from './state/turn/turn.effects';
 import {turnReducer} from './state/turn/turn.reducer';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,12 +32,14 @@ export const appConfig: ApplicationConfig = {
     provideFirestore(() => getFirestore()),
     provideIonicAngular({}),
     provideStore({
-                   answers: answerReducer,
                    game: gameReducer,
                    players: playerReducer,
                    turn: turnReducer,
                    }),
-    provideEffects([AnswerEffects, GameEffects, PlayerEffects, TurnEffects]),
-    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
+    provideEffects([GameEffects, PlayerEffects, TurnEffects]),
+    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }), provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          })
 ]
 };

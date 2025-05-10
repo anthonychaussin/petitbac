@@ -1,8 +1,18 @@
 import {AsyncPipe} from '@angular/common';
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {IonButton, IonContent, IonInput, IonItem, IonLabel, IonList} from '@ionic/angular/standalone';
+import {
+  IonButton,
+  IonCard, IonCardContent, IonCardSubtitle,
+  IonCardTitle,
+  IonContent, IonGrid,
+  IonItem,
+  IonLabel,
+  IonList, IonRow,
+  ToastController
+} from '@ionic/angular/standalone';
 import {Store} from '@ngrx/store';
+import {take} from 'rxjs';
 import {Player} from '../../Models/Player';
 import {GameService} from '../../services/game.service';
 import {loadGameParams, loadGameStatus} from '../../state/game/game.actions';
@@ -19,15 +29,21 @@ import {selectPlayerList} from '../../state/player/player.selectors';
                IonItem,
                IonLabel,
                IonButton,
-               IonInput,
-               AsyncPipe
+               AsyncPipe,
+               IonCard,
+               IonCardTitle,
+               IonCardSubtitle,
+               IonCardContent,
+               IonRow,
+               IonGrid
              ]
            })
-export class WaitingRoomPage implements OnInit {
+export class WaitingRoomPage {
 
   private store = inject(Store);
   private gameService: GameService = inject(GameService);
   private router: Router = inject(Router);
+  private toastController: ToastController = inject(ToastController);
 
   players$ = this.store.select(selectPlayerList);
   game$ = this.store.select(selectGameParams);
@@ -54,37 +70,21 @@ export class WaitingRoomPage implements OnInit {
       } else {
         playerSubscriber.unsubscribe();
       }
-    });
-    const gameSubscriber = this.status$.subscribe(status => {
-      if (status == 'started') {
-        if(this.host) {
-          this.router.navigate(['/validation-game/' + this.gameId]);
-        } else {
-          this.router.navigate(['/game/'+this.gameId]);
-        }
-      }
-    })
-  }
 
-  ngOnInit(): void {
-    this.game$.subscribe(game => {
-    if (!game) return;
-    if (game.status === 'started') {
-      this.redirectOnGameStart();
-    }
-  });
+      const gameSubscriber = this.status$.subscribe(status => {
+        if (status == 'started') {
+          this.redirectOnGameStart().then(() => gameSubscriber.unsubscribe());
+        }
+      });
+    });
   }
 
   startGame() {
-      this.gameService.startGame(this.gameId, {letter: undefined}).then(game => {
-        if(this.host){
-          this.router.navigate(['/validation-game/'+this.gameId]);
-
-        } else {
-          this.router.navigate(['/game/'+this.gameId]);
-        }
-
+    this.game$.pipe(take(1)).subscribe(game => {
+      this.gameService.startGame(this.gameId, {letter: undefined}, game.timer).then(game => {
+        this.redirectOnGameStart().then();
       });
+    });
   }
 
   get shareUrl(): string {
@@ -92,14 +92,19 @@ export class WaitingRoomPage implements OnInit {
   }
 
   copyLink() {
-    navigator.clipboard.writeText(this.shareUrl).then(() => {
-      alert('Lien copié ✅');
+    navigator.clipboard.writeText(this.shareUrl).then(async () => {
+      const toast = await this.toastController.create({
+                                                          message: 'Lien d\invitation copié ! ✅',
+                                                          duration: 1500,
+                                                          position: 'bottom',
+                                                        });
+
+        await toast.present();
     });
   }
 
   async redirectOnGameStart() {
-    const isHost = localStorage.getItem('host') === 'true';
-    if (isHost) {
+    if (this.host) {
       return await this.router.navigate(['/validation-game', this.gameId]);
     } else {
       return await this.router.navigate(['/game', this.gameId]);

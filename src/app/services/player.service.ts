@@ -4,24 +4,17 @@ import {Database, getDatabase, ref, set, update} from '@angular/fire/database';
 import {Store} from '@ngrx/store';
 import {BehaviorSubject} from 'rxjs';
 import {Player} from '../Models/Player';
-import {selectPlayerList} from '../state/player/player.selectors';
 import {AnswerService} from './answer.service';
 
 @Injectable({providedIn: 'root'})
 export class PlayerService {
 
-  private db: Database = getDatabase(inject(FirebaseApp));
+  private db: Database = inject(Database);
   private answerService: AnswerService = inject(AnswerService);
-  private store: Store= inject(Store);
-  private players$ = this.store.select(selectPlayerList);
 
 
-  addPlayerToGame(gameId: string, pseudo: string, playerId: string, host_id: string|undefined) {
-    const added = new BehaviorSubject<boolean>(false);
-    set(ref(this.db, 'games/' + gameId + '/players/'+playerId), {pseudo : pseudo, score: 0, host: host_id!=undefined}).then(result => {
-      added.next(true);
-    }).catch(e => console.error(e));
-    return added.asObservable();
+  async addPlayerToGame(gameId: string, pseudo: string, playerId: string, host_id: string|undefined) {
+    return await set(ref(this.db, 'games/' + gameId + '/players/'+playerId), {pseudo : pseudo, score: 0, host: host_id!=undefined})
   }
 
 	async updateScore(gameId: string, player: Player, number: number): Promise<void> {

@@ -1,15 +1,20 @@
 <ion-content class="ion-padding">
-  <h2 class="ion-text-center">Rejoindre une partie</h2>
-  <p class="ion-text-center">Code : <strong>{{ gameId }}</strong></p>
+  <ion-card class="ion-padding">
+    <ion-card-title class="ion-text-center">Rejoindre une partie</ion-card-title>
+    <ion-card-subtitle class="ion-text-center ion-margin-top">Code : <strong>{{ gameId }}</strong></ion-card-subtitle>
 
-  @if (status != 'started') {
-    <ion-item>
-    <ion-label position="floating">Ton pseudo</ion-label>
-    <ion-input [(ngModel)]="pseudo"></ion-input>
-  </ion-item>
-
-  <ion-button expand="block" class="ion-margin-top" (click)="joinGame()">
+    <ion-card-content>
+      @if (status != 'started') {
+        <ion-item>
+        <ion-label position="stacked">Ton pseudo</ion-label>
+        <ion-input [(ngModel)]="pseudo"></ion-input>
+      </ion-item>
+      }
+    </ion-card-content>
+    @if (status != 'started') {
+      <ion-button expand="block" class="ion-margin-top" (click)="joinGame()">
     Rejoindre
   </ion-button>
-  }
+    }
+  </ion-card>
 </ion-content>

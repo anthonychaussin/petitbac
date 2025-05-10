@@ -1,10 +1,17 @@
 <ion-content class="ion-padding">
-  <h2 class="ion-text-center">En attente des autres joueurs... ⏳</h2>
+  @if ((gameStatus$|async) === 'started') {
+    <h2 class="ion-text-center">En attente des autres joueurs... ⏳</h2>
+  }
+  @if ((gameStatus$|async) === 'validation') {
+    <h2 class="ion-text-center">En attente de validation... ⏳</h2>
+  }
 
-  <div>
-    <h3 class="ion-text-center">Réponses des joueurs</h3>
-    <p>Temps restant : <strong>{{ (turn$ | async)?.timer}}s</strong></p>
+  <h3 class="ion-text-center">Réponses des joueurs</h3>
 
+  <ion-card class="ion-padding ion-margin">
+    <ion-card-title>Temps restant : <strong>{{ (turn$ | async)?.timer}}s</strong></ion-card-title>
+
+    <ion-card-content>
     <ion-grid>
       <ion-row>
         <ion-col><strong>Joueur</strong></ion-col>
@@ -22,6 +29,8 @@
             <ion-col>
               @if(player.uid == uid || (allDone$ | async)){
                 {{ player?.getAnswer(cat) }}
+              } @else if ((gameStatus$|async) === 'validation') {
+                -
               } @else {
                 <ion-spinner name="dots"></ion-spinner>
               }
@@ -30,5 +39,6 @@
         </ion-row>
       }
     </ion-grid>
-  </div>
+  </ion-card-content>
+    </ion-card>
 </ion-content>

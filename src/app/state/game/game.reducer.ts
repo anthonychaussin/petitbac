@@ -12,7 +12,7 @@ export interface GameState {
   status: string;
 }
 
-export const initialState: GameState = {
+export const initialGameState: GameState = {
   data: null,
   loading: false,
   error: null,
@@ -24,7 +24,7 @@ export const initialState: GameState = {
 };
 
 export const gameReducer = createReducer(
-  initialState,
+  initialGameState,
   on(GameActions.nextRound, state => ({
     ...state,
     roundId: state.roundId + 1,

@@ -2,6 +2,7 @@ import {AsyncPipe} from '@angular/common';
 import {Component, inject} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
+  IonCard, IonCardContent, IonCardTitle,
   IonCol,
   IonContent, IonGrid, IonRow,
   IonSpinner
@@ -27,7 +28,10 @@ import {selectTurnData} from '../../state/turn/turn.selectors';
                AsyncPipe,
                IonGrid,
                IonRow,
-               IonCol
+               IonCol,
+               IonCard,
+               IonCardTitle,
+               IonCardContent
              ]
            })
 export class WaitingGamePage {

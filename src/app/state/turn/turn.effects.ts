@@ -1,11 +1,10 @@
-import { Injectable, inject } from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {FirebaseApp} from '@angular/fire/app';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import {Database, ref, onValue, getDatabase} from '@angular/fire/database';
-import {Store} from '@ngrx/store';
-import {interval, Observable} from 'rxjs';
-import { loadTurn, loadTurnSuccess } from './turn.actions';
-import {map, switchMap, takeUntil} from 'rxjs/operators';
+import {Database, getDatabase, onValue, ref} from '@angular/fire/database';
+import {Actions, createEffect, ofType} from '@ngrx/effects';
+import {Observable} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
+import {loadTurn, loadTurnSuccess} from './turn.actions';
 
 @Injectable()
 export class TurnEffects {
@@ -14,11 +13,11 @@ export class TurnEffects {
   loadTurn$ = createEffect(() =>
                              this.actions$.pipe(
                                ofType(loadTurn),
-                               switchMap(({ gameId }) => {
+                               switchMap(({gameId}) => {
                                  return new Observable<any>(observer => {
                                    onValue(ref(this.db, `games/${gameId}/current`), snapshot => {
                                      let data = snapshot.val();
-                                     observer.next(loadTurnSuccess({ data }));
+                                     observer.next(loadTurnSuccess({data}));
                                    });
                                  });
                                })

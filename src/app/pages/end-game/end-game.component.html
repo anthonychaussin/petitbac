@@ -8,7 +8,7 @@
   <ion-grid>
     <ion-row class="ion-justify-content-center">
       @for (player of (players$|async); track player.uid) {
-        <ion-col size="4">
+        <ion-col size="4" class="podium-animated">
         <ion-card [color]="getPodiumColor($index)">
           <ion-card-header class="ion-text-center">
             <ion-card-title>

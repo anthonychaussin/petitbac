@@ -1,11 +1,12 @@
 <ion-content class="ion-padding">
   <h2 class="ion-text-center">Validation des réponses</h2>
+  <h3 class="ion-text-center">Lettre : {{ (turn$ | async)?.letter }}</h3>
+  <ion-card class="ion-padding">
+    <ion-card-title>
+      Temps restant : <strong><ion-text [color]="getTimerColor((turn$ | async)?.timer)">{{ (turn$ | async)?.timer}}s</ion-text></strong>
+    </ion-card-title>
 
-  <div>
-    <h3 class="ion-text-center">Lettre : {{ (turn$ | async)?.letter }}</h3>
-    <p>Temps restant : <strong>{{ (turn$ | async)?.timer}}s</strong></p>
-  </div>
-
+    <ion-card-content>
   <ion-grid>
     <ion-row>
       <ion-col size="2"><strong>Joueur</strong></ion-col>
@@ -21,7 +22,7 @@
         @for (cat of (game$|async)?.categories; track cat) {
           <ion-col>
         <ion-item lines="none">
-          <ion-label>
+          <ion-label (click)="player.answers.get(cat)!.valide = !player.answers.get(cat)!.valide">
             {{ player?.getAnswer(cat)  }}
           </ion-label>
           @if(player.answers.has(cat)){
@@ -37,8 +38,12 @@
     </ion-row>
     }
   </ion-grid>
+      </ion-card-content>
 
-  <ion-button expand="block" color="success" (click)="validateRound()" class="ion-margin-top">
-    Valider la manche
-  </ion-button>
+    @if ((gameStatus$|async) === 'validation' || (allDone$|async)){
+      <ion-button expand="block" color="success" (click)="validateRound()" class="ion-margin-top">
+        Valider la manche
+      </ion-button>
+    }
+    </ion-card>
 </ion-content>
